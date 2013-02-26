@@ -1,0 +1,10 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <me.malladi.dashcricket.LiveScoreIdPreference
+        android:defaultValue="0"
+        android:key="live_score_id"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/match" />
+
+</PreferenceScreen>

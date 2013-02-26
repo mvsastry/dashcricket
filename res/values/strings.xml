@@ -1,5 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">DashCricket</string>
-
+    <string name="app_name">DashCricket - DashClock Live Cricket Scores Extension</string>
+    <string name="extension_name">Live cricket scores</string>
+    <string name="extension_description">Displays live cricket scores. Tap settings to pick a match.</string>
+    <string name="configure_status">%1$d</string>
+    <string name="configure_title">Live scores available</string>
+    <string name="configure_body">Tap here to select one</string>
+    <string name="settings_title">DashCricket Settings</string>
+    <string name="match">Match</string>
+    <string name="none">None</string>
+    <string name="fetching_matches">Fetching matches in progress...</string>
+    <string name="error_fetch">Unable to fetch matches</string>
+    <string name="error_no_matches">No matches in progress</string>
+    
 </resources>
