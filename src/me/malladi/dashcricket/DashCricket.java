@@ -45,20 +45,21 @@ public class DashCricket extends DashClockExtension {
 		Util.debug("onUpdateData(" + reason + ")");
 
 		// Check whether the network is available.
-        NetworkInfo networkInfo = ((ConnectivityManager) getSystemService(
-        		Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
-        if (networkInfo == null || !networkInfo.isConnected()) {
-    		Util.debug("not connected to the network");
-            return;
-        }
+		NetworkInfo networkInfo = ((ConnectivityManager) getSystemService(
+				Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+		if (networkInfo == null || !networkInfo.isConnected()) {
+			Util.debug("not connected to the network");
+			return;
+		}
 
-        // Fetch live scores from the network.
+		// Fetch live scores from the network.
 		LiveScore[] liveScores = Util.getLiveScores();
 		if (liveScores == null) {
 			return;
 		} else if (liveScores.length == 0){
-    		Util.debug("no matches in progress");
 			publishUpdate(new ExtensionData().visible(false));
+			Util.debug("no matches in progress");
+			return;
 		}
 
 		// Publish the preferred live score.
