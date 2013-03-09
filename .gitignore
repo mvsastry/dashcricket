@@ -31,3 +31,6 @@ proguard/
 
 # Mac files
 .DS_Store
+
+# Test data
+testdata/

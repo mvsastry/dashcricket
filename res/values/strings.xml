@@ -6,12 +6,56 @@
     <string name="extension_description">Displays live cricket scores. Tap settings to pick a match.</string>
     <string name="configure_status">%1$d</string>
     <string name="configure_title">Live scores available</string>
-    <string name="configure_body">Tap here to select one</string>
+    <string name="configure_body">Tap here to select a country or a match or to hide the scores.</string>
     <string name="settings_title">DashCricket Settings</string>
+    <string name="show_live_scores">Show live scores</string>
+    <string name="country">Country</string>
     <string name="match">Match</string>
     <string name="none">None</string>
     <string name="fetching_matches">Fetching matches in progress...</string>
     <string name="error_fetch">Unable to fetch matches</string>
     <string name="error_no_matches">No matches in progress</string>
     
+    <string-array name="countries">
+        <item>All Countries</item>
+        <item>Afghanistan</item>
+        <item>Australia</item>
+        <item>Bangladesh</item>
+        <item>Canada</item>
+        <item>England</item>
+        <item>India</item>
+        <item>Ireland</item>
+        <item>Kenya</item>
+        <item>Netherlands</item>
+        <item>New Zealand</item>
+        <item>Pakistan</item>
+        <item>Scotland</item>
+        <item>South Africa</item>
+        <item>Sri Lanka</item>
+        <item>USA</item>
+        <item>West Indies</item>
+        <item>Zimbabwe</item>
+    </string-array>
+
+    <string-array name="country_values">
+        <item>0</item>
+        <item>40</item>
+        <item>2</item>
+        <item>25</item>
+        <item>17</item>
+        <item>1</item>
+        <item>6</item>
+        <item>29</item>
+        <item>26</item>
+        <item>15</item>
+        <item>5</item>
+        <item>7</item>
+        <item>30</item>
+        <item>3</item>
+        <item>8</item>
+        <item>11</item>
+        <item>4</item>
+        <item>9</item>
+    </string-array>
+
 </resources>

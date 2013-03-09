@@ -31,8 +31,12 @@ import com.google.android.apps.dashclock.api.ExtensionData;
  * A DashClock extension for fetching live cricket scores.
  */
 public class DashCricket extends DashClockExtension {
+	public static final String PREF_SHOW_LIVE_SCORES = "show_live_scores";
+	public static final String PREF_COUNTRY = "country";
 	public static final String PREF_LIVE_SCORE_ID = "live_score_id";
 	public static final String PREF_LIVE_SCORE_SUMMARY = "live_score_summary";
+	public static final String ALL_COUNTRIES = "0";
+	public static final String NO_LIVE_SCORE_ID = "0";
 
 	@Override
 	protected void onInitialize(boolean isReconnect) {
@@ -44,7 +48,16 @@ public class DashCricket extends DashClockExtension {
 	protected void onUpdateData(int reason) {
 		Util.debug("onUpdateData(" + reason + ")");
 
-		// Check whether the network is available.
+		// Check if the live scores are enabled.
+		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean showLiveScores = sharedPref.getBoolean(PREF_SHOW_LIVE_SCORES, true);
+		if (!showLiveScores) {
+			publishUpdate(new ExtensionData().visible(false));
+			Util.debug("show live scores disabled");
+			return;
+		}
+
+		// Check if the network is available.
 		NetworkInfo networkInfo = ((ConnectivityManager) getSystemService(
 				Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
 		if (networkInfo == null || !networkInfo.isConnected()) {
@@ -56,41 +69,66 @@ public class DashCricket extends DashClockExtension {
 		LiveScore[] liveScores = Util.getLiveScores();
 		if (liveScores == null) {
 			return;
-		} else if (liveScores.length == 0){
+		}
+
+		// Check if there are matches in progress.
+		if (liveScores.length == 0) {
 			publishUpdate(new ExtensionData().visible(false));
 			Util.debug("no matches in progress");
 			return;
 		}
 
-		// Publish the preferred live score.
-		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-		String liveScoreId = sharedPref.getString(PREF_LIVE_SCORE_ID, "NONE");
-		Util.debug(PREF_LIVE_SCORE_ID + " " + liveScoreId);
-		for (LiveScore liveScore : liveScores) {
-			if (liveScoreId.equals(liveScore.id)) {
-				publishUpdate(new ExtensionData()
-						.visible(true)
-						.icon(R.drawable.ic_launcher)
-						.status(liveScore.getStatus())
-						.expandedTitle(liveScore.getExpandedTitle())
-						.expandedBody(liveScore.getExpandedBody())
-						.clickIntent(new Intent(Intent.ACTION_VIEW,
-								Uri.parse(liveScore.liveScorecardLink))));
-				Util.debug("showing scores for match " + liveScore.id);
-				return;
+		// Check if there is a preferred country.
+		String countryId = sharedPref.getString(PREF_COUNTRY, ALL_COUNTRIES);
+		Util.debug(PREF_COUNTRY + " " + countryId);
+		if (!countryId.equals(ALL_COUNTRIES)) {
+			for (LiveScore liveScore : liveScores) {
+				if (countryId.equals(liveScore.teamOneId) ||
+						countryId.equals(liveScore.teamTwoId)) {
+					publishLiveScore(liveScore);
+					Util.debug("showing scores for preferred country match " + liveScore.id);
+					return;
+				}
 			}
-		}
 
-		// Allow the user to pick a live score.
+			publishUpdate(new ExtensionData().visible(false));
+			Util.debug("no preferred country matches in progress");
+			return;
+		} else {
+			String liveScoreId = sharedPref.getString(PREF_LIVE_SCORE_ID, NO_LIVE_SCORE_ID);
+			Util.debug(PREF_LIVE_SCORE_ID + " " + liveScoreId);
+			
+			for (LiveScore liveScore : liveScores) {
+				if (liveScoreId.equals(liveScore.id)) {
+					publishLiveScore(liveScore);
+					Util.debug("showing scores for match " + liveScore.id);
+					return;
+				}
+			}
+
+			// Allow the user to pick a live score.
+			publishUpdate(new ExtensionData()
+					.visible(true)
+					.icon(R.drawable.ic_launcher)
+					.status(getString(R.string.configure_status, liveScores.length))
+					.expandedTitle(getString(R.string.configure_title))
+					.expandedBody(getString(R.string.configure_body))
+					.clickIntent(new Intent().setClassName(
+							"me.malladi.dashcricket",
+							"me.malladi.dashcricket.DashCricketSettingsActivity")));
+			Util.debug("need to configure");				
+		}
+	}
+
+	private void publishLiveScore(LiveScore liveScore) {
 		publishUpdate(new ExtensionData()
 				.visible(true)
 				.icon(R.drawable.ic_launcher)
-				.status(getString(R.string.configure_status, liveScores.length))
-				.expandedTitle(getString(R.string.configure_title))
-				.expandedBody(getString(R.string.configure_body))
-				.clickIntent(new Intent().setClassName(
-						"me.malladi.dashcricket",
-						"me.malladi.dashcricket.DashCricketSettingsActivity")));
-		Util.debug("need to configure");
+				.status(liveScore.getStatus())
+				.expandedTitle(liveScore.getExpandedTitle())
+				.expandedBody(liveScore.getExpandedBody())
+				.clickIntent(new Intent(Intent.ACTION_VIEW,
+						Uri.parse(liveScore.liveScorecardLink))));
+		return;
 	}
 }

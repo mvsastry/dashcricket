@@ -28,20 +28,26 @@ public class LiveScore {
 	private static final String EMPTY = "";
 
 	public final String id;
+	public final String teamOneId;
 	public final String teamOneName;
 	public final String teamOneAbbreviation;
+	public final String teamTwoId;
 	public final String teamTwoName;
 	public final String teamTwoAbbreviation;
 	public final String matchTitle;
 	public final String townName;
 	public final String liveScorecardText;
 	public final String liveScorecardLink;
+	public final String matchStatus;
+	public final String matchClock;
 	public final String result;
 
 	public LiveScore(JSONObject json) {
 		id = json.optString("object_id", EMPTY);
+		teamOneId = json.optString("team1_id", EMPTY);
 		teamOneName = json.optString("team1_name", EMPTY);
 		teamOneAbbreviation = json.optString("team1_abbrevation", EMPTY);
+		teamTwoId = json.optString("team2_id", EMPTY);
 		teamTwoName = json.optString("team2_name", EMPTY);
 		teamTwoAbbreviation = json.optString("team2_abbrevation", EMPTY);
 		matchTitle = json.optString("cms_match_title", EMPTY);
@@ -49,6 +55,8 @@ public class LiveScore {
 		liveScorecardText = StringEscapeUtils.unescapeHtml4(
 				json.optString("live_scorecard_text", EMPTY));
 		liveScorecardLink = json.optString("live_scorecard_link", EMPTY);
+		matchStatus = json.optString("match_status", EMPTY);
+		matchClock = json.optString("match_clock", EMPTY);
 		result = json.optString("result", EMPTY);
 	}
 
@@ -56,8 +64,17 @@ public class LiveScore {
 	 * @return The string for {@link ExtensionData#status(String)}
 	 */
 	public String getStatus() {
-		return liveScorecardText.replace(teamOneName, teamOneAbbreviation)
-				.replace(teamTwoName, teamTwoAbbreviation);
+		if (matchIsScheduled()) {
+			return teamOneAbbreviation + " v " + teamTwoAbbreviation + "\n" +
+					"in " + matchClock;
+		} else if (matchHasResult()) {
+			return teamOneAbbreviation + " v " + teamTwoAbbreviation + "\n" +
+					result;
+		} else {
+			return liveScorecardText.replace(teamOneName, teamOneAbbreviation)
+					.replace(teamTwoName, teamTwoAbbreviation)
+					.replace(" v ", "\n");
+		}
 	}
 
 	/**
@@ -71,7 +88,13 @@ public class LiveScore {
 	 * @return The string for {@link ExtensionData#expandedBody(String)}
 	 */
 	public String getExpandedBody() {
-		return matchTitle + ", " + townName;
+		if (matchIsScheduled()) {
+			return matchTitle + ", " + townName + ", in " + matchClock;	
+		} else if (matchHasResult()) {
+			return result;
+		} else {
+			return matchTitle + ", " + townName;
+		}
 	}
 
 	/**
@@ -79,5 +102,19 @@ public class LiveScore {
 	 */
 	public String getPreferenceEntry() {
 		return teamOneAbbreviation + " v " + teamTwoAbbreviation + ", " + matchTitle;
+	}
+
+	/**
+	 * @return true if the match is scheduled.
+	 */
+	private boolean matchIsScheduled() {
+		return matchStatus.equals("dormant");
+	}
+
+	/**
+	 * @return true if the match has a result.
+	 */
+	private boolean matchHasResult() {
+		return !(result.equals(EMPTY) || result.equals("0") || result.equals("null"));		
 	}
 }

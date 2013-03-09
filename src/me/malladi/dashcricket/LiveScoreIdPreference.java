@@ -27,7 +27,6 @@ import android.util.AttributeSet;
  * in progress upon click.
  */
 public class LiveScoreIdPreference extends ListPreference {
-	private static final int NO_ERROR = 0;
 	private static SharedPreferences mSharedPrefs;
 
 	public LiveScoreIdPreference(Context context) {
@@ -52,21 +51,15 @@ public class LiveScoreIdPreference extends ListPreference {
 	}
 
 	/**
-	 * Shows the error message if there's one. Calls {@link ListPreference#onClick()} otherwise.
-	 * 
-	 * @param error The error message to be shown.
+	 * Callback for {link {@link FetchLiveScoresTask}
 	 */
-	protected void onClick(int error) {
-		if (error != NO_ERROR) {
-			setSummary(error);
+	private void onLiveScoresFetched() {
+		if (getEntry() != null) {
+			setSummary(getEntry().toString());
 		} else {
-			if (getEntry() != null) {
-				setSummary(getEntry().toString());
-			} else {
-				setSummary(R.string.none);
-			}
-			super.onClick();
+			resetPreference();
 		}
+		super.onClick();
 	}
 
 	@Override
@@ -74,12 +67,28 @@ public class LiveScoreIdPreference extends ListPreference {
 		super.setValue(value);
 		if (getEntry() != null) {
 			String summary = getEntry().toString();
-			setSummary(summary);
-			if (mSharedPrefs != null) {
-				mSharedPrefs.edit().putString(
-						DashCricket.PREF_LIVE_SCORE_SUMMARY, summary).commit();
-			}
+			setSummaryAndSaveToSharedPrefs(summary);
 		}
+	}
+
+	/**
+	 * Show the summary in the UI and save it in the {@link SharedPreferences}
+	 * 
+	 * @param summary The summary to show.
+	 */
+	public void setSummaryAndSaveToSharedPrefs(String summary) {
+		setSummary(summary);
+		if (mSharedPrefs != null) {
+			mSharedPrefs.edit().putString(DashCricket.PREF_LIVE_SCORE_SUMMARY, summary).commit();			
+		}
+	}
+
+	/**
+	 * Reset the preference.
+	 */
+	public void resetPreference() {
+		setValue(DashCricket.NO_LIVE_SCORE_ID);
+		setSummaryAndSaveToSharedPrefs(getContext().getString(R.string.none));
 	}
 
 	/**
@@ -94,9 +103,10 @@ public class LiveScoreIdPreference extends ListPreference {
 		@Override
 		protected void onPostExecute(LiveScore[] liveScores) {
 			if (liveScores == null) {
-				onClick(R.string.error_fetch);
+				setSummary(R.string.error_fetch);
 			} else if (liveScores.length == 0) {
-				onClick(R.string.error_no_matches);
+				resetPreference();
+				setSummary(R.string.error_no_matches);
 			} else {
 				CharSequence[] entries = new CharSequence[liveScores.length];
 				CharSequence[] entryValues = new CharSequence[liveScores.length];
@@ -107,7 +117,7 @@ public class LiveScoreIdPreference extends ListPreference {
 				}
 				setEntries(entries);
 				setEntryValues(entryValues);
-				onClick(NO_ERROR);
+				onLiveScoresFetched();
 			}
 		}
 	}
