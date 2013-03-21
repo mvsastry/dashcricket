@@ -35,6 +35,7 @@ public class DashCricket extends DashClockExtension {
 	public static final String PREF_COUNTRY = "country";
 	public static final String PREF_LIVE_SCORE_ID = "live_score_id";
 	public static final String PREF_LIVE_SCORE_SUMMARY = "live_score_summary";
+	public static final String PREF_LINK_TO_MOBILE_SITE = "link_to_mobile_site";
 	public static final String ALL_COUNTRIES = "0";
 	public static final String NO_LIVE_SCORE_ID = "0";
 
@@ -80,12 +81,13 @@ public class DashCricket extends DashClockExtension {
 
 		// Check if there is a preferred country.
 		String countryId = sharedPref.getString(PREF_COUNTRY, ALL_COUNTRIES);
+		boolean mobileSite = sharedPref.getBoolean(PREF_LINK_TO_MOBILE_SITE, true);
 		Util.debug(PREF_COUNTRY + " " + countryId);
 		if (!countryId.equals(ALL_COUNTRIES)) {
 			for (LiveScore liveScore : liveScores) {
 				if (countryId.equals(liveScore.teamOneId) ||
 						countryId.equals(liveScore.teamTwoId)) {
-					publishLiveScore(liveScore);
+					publishLiveScore(liveScore, mobileSite);
 					Util.debug("showing scores for preferred country match " + liveScore.id);
 					return;
 				}
@@ -100,7 +102,7 @@ public class DashCricket extends DashClockExtension {
 			
 			for (LiveScore liveScore : liveScores) {
 				if (liveScoreId.equals(liveScore.id)) {
-					publishLiveScore(liveScore);
+					publishLiveScore(liveScore, mobileSite);
 					Util.debug("showing scores for match " + liveScore.id);
 					return;
 				}
@@ -120,7 +122,7 @@ public class DashCricket extends DashClockExtension {
 		}
 	}
 
-	private void publishLiveScore(LiveScore liveScore) {
+	private void publishLiveScore(LiveScore liveScore, boolean mobileSite) {
 		publishUpdate(new ExtensionData()
 				.visible(true)
 				.icon(R.drawable.ic_launcher)
@@ -128,7 +130,7 @@ public class DashCricket extends DashClockExtension {
 				.expandedTitle(liveScore.getExpandedTitle())
 				.expandedBody(liveScore.getExpandedBody())
 				.clickIntent(new Intent(Intent.ACTION_VIEW,
-						Uri.parse(liveScore.liveScorecardLink))));
+						Uri.parse(liveScore.getLiveScorecardLink(mobileSite)))));
 		return;
 	}
 }

@@ -24,4 +24,10 @@
         android:positiveButtonText="@null"
         android:title="@string/match" />
 
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="link_to_mobile_site"
+        android:title="@string/link_to_mobile_site"
+        android:summary="@string/link_to_mobile_site_summary" />
+
 </PreferenceScreen>

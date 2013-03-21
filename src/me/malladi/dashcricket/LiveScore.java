@@ -26,6 +26,8 @@ import com.google.android.apps.dashclock.api.ExtensionData;
  */
 public class LiveScore {
 	private static final String EMPTY = "";
+	private static final String MOBILE_SITE_URL_PREFIX =
+			"http://m.espncricinfo.com/s/showPage.do?siteId=76456&pageId=MatchCenter&matchId=";
 
 	public final String id;
 	public final String teamOneId;
@@ -102,6 +104,14 @@ public class LiveScore {
 	 */
 	public String getPreferenceEntry() {
 		return teamOneAbbreviation + " v " + teamTwoAbbreviation + ", " + matchTitle;
+	}
+
+	/**
+	 * @param mobileSite true if we want a link to the mobile site.
+	 * @return The URL to view this live score in a browser.
+	 */
+	public String getLiveScorecardLink(boolean mobileSite) {
+		return mobileSite ? MOBILE_SITE_URL_PREFIX + id : liveScorecardLink;
 	}
 
 	/**
