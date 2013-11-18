@@ -48,10 +48,10 @@ public class LiveScore {
 		id = json.optString("object_id", EMPTY);
 		teamOneId = json.optString("team1_id", EMPTY);
 		teamOneName = json.optString("team1_name", EMPTY);
-		teamOneAbbreviation = json.optString("team1_abbrevation", EMPTY);
+		teamOneAbbreviation = json.optString("team1_abbreviation", EMPTY);
 		teamTwoId = json.optString("team2_id", EMPTY);
 		teamTwoName = json.optString("team2_name", EMPTY);
-		teamTwoAbbreviation = json.optString("team2_abbrevation", EMPTY);
+		teamTwoAbbreviation = json.optString("team2_abbreviation", EMPTY);
 		matchTitle = json.optString("cms_match_title", EMPTY);
 		townName = json.optString("town_name", EMPTY);
 		liveScorecardText = StringEscapeUtils.unescapeHtml4(
